@@ -175,6 +175,7 @@ void ZEDWrapperNodelet::onInit()
 
   std::string odomStatusTopic = odometryTopic + "/status";
   std::string poseStatusTopic = poseTopic + "/status";
+  std::string closuresStatusTopic = poseTopic + "/closures_status";
 
   // Extracted plane topics
   std::string marker_topic = "plane_marker";
@@ -538,6 +539,8 @@ void ZEDWrapperNodelet::onInit()
     NODELET_INFO_STREAM(" * Advertised on topic " << mPubOdomStatus.getTopic());
     mPubPoseStatus = mNhNs.advertise<zed_interfaces::PosTrackStatus>(poseStatusTopic, 1);
     NODELET_INFO_STREAM(" * Advertised on topic " << mPubPoseStatus.getTopic());
+    mPubClosuresStatus = mNhNs.advertise<zed_interfaces::PosTrackStatus>(closuresStatusTopic, 1);
+    NODELET_INFO_STREAM(" * Advertised on topic " << mPubClosuresStatus.getTopic());
 
     // Rviz markers publisher
     mPubMarker = mNhNs.advertise<visualization_msgs::Marker>(marker_topic, 10, true);
@@ -5488,6 +5491,19 @@ void ZEDWrapperNodelet::publishPoseStatus()
   }
 }
 
+void ZEDWrapperNodelet::publishClosureStatus()
+{
+  size_t statusSub = mPubClosuresStatus.getNumSubscribers();
+
+  if (statusSub > 0)
+  {
+    zed_interfaces::PosTrackStatusPtr msg = boost::make_shared<zed_interfaces::PosTrackStatus>();
+    msg->status = static_cast<uint8_t>(mPosTrackingStatusAll.spatial_memory_status);
+
+    mPubPoseStatus.publish(msg);
+  }
+}
+
 void ZEDWrapperNodelet::publishOdomStatus()
 {
   size_t statusSub = mPubOdomStatus.getNumSubscribers();
@@ -5596,10 +5612,12 @@ void ZEDWrapperNodelet::processPose()
   }
 
   mPosTrackingStatusWorld = mZed.getPosition(mLastZedPose, sl::REFERENCE_FRAME::WORLD);
+  mPosTrackingStatusAll = mZed.getPositionalTrackingStatus();
 
   NODELET_DEBUG_STREAM("ZED Pose: " << mLastZedPose.pose_data.getInfos());
 
   publishPoseStatus();
+  publishClosureStatus();
 
   sl::Translation translation = mLastZedPose.getTranslation();
   sl::Orientation quat = mLastZedPose.getOrientation();

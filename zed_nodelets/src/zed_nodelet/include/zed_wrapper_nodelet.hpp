@@ -181,6 +181,10 @@ protected:
   /*! \brief Publish odometry status message
    */
   void publishOdomStatus();
+  
+  /*! \brief Publish loop closure status message
+   */
+  void publishClosureStatus();
 
   /*! \brief Process odometry information
    */
@@ -534,6 +538,7 @@ private:
   ros::Publisher mPubPlane;   // Publisher for detected planes
 
   ros::Publisher mPubPoseStatus;
+  ros::Publisher mPubClosuresStatus;
   ros::Publisher mPubOdomStatus;
 
   // Subscribers
@@ -659,6 +664,7 @@ private:
   sl::ERROR_CODE mGrabStatus;
   sl::POSITIONAL_TRACKING_STATE mPosTrackingStatusWorld;
   sl::POSITIONAL_TRACKING_STATE mPosTrackingStatusCamera;
+  sl::PositionalTrackingStatus mPosTrackingStatusAll;
   bool mSensPublishing = false;
   bool mPcPublishing = false;
   bool mDepthDisabled = false;
