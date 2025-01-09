@@ -5614,6 +5614,7 @@ void ZEDWrapperNodelet::processPose()
   mPosTrackingStatusWorld = mZed.getPosition(mLastZedPose, sl::REFERENCE_FRAME::WORLD);
   try {
     mPosTrackingStatusAll = mZed.getPositionalTrackingStatus();
+    publishClosureStatus();
   }
   catch (...) {
     ROS_INFO("Caught exception");
@@ -5621,7 +5622,6 @@ void ZEDWrapperNodelet::processPose()
   NODELET_DEBUG_STREAM("ZED Pose: " << mLastZedPose.pose_data.getInfos());
 
   publishPoseStatus();
-  publishClosureStatus();
 
   sl::Translation translation = mLastZedPose.getTranslation();
   sl::Orientation quat = mLastZedPose.getOrientation();
