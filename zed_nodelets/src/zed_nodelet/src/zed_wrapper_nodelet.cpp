@@ -5500,7 +5500,7 @@ void ZEDWrapperNodelet::publishClosureStatus()
     zed_interfaces::PosTrackStatusPtr msg = boost::make_shared<zed_interfaces::PosTrackStatus>();
     msg->status = static_cast<uint8_t>(mPosTrackingStatusAll.spatial_memory_status);
 
-    mPubPoseStatus.publish(msg);
+    mPubClosuresStatus.publish(msg);
   }
 }
 
